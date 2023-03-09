@@ -73,6 +73,7 @@ function banniereConfig {
             banner motd $banniere
             end
             echo "Le format de la bannière est correct!"
+            echo "Votre bannière: $banniere"
             return $banniere
         else
             echo "Le format de la bannière est incorrect!"
