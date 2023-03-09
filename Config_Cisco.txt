@@ -1,0 +1,79 @@
+enable
+
+configure terminal
+no ip domain-lookup
+-----Attribution d'un nom unique au switch--------
+hostname Batman
+
+-----Création d'un mot de passe pour accéder à la console du switch--------
+configure terminal
+line console 0
+password cisco
+login
+end
+
+------Création d'un mot de passe pour accéder à la console en mode priviliègé du switch----
+configure terminal
+enable secret hulk
+exit
+
+-----Création d'un mot de passe pour accéder à la console en mode vty du switch-----
+configure terminal
+line vty 0 15
+password dora
+login
+end
+
+-----Création d'une bannière lors de la connexion du switch---------
+configure terminal
+banner motd #Ici on est a l'heure#
+end
+
+-----Mise en place des mots de passe scriptés------
+configure terminal
+service password-encryption
+end
+
+------Mise en place d'un VLAN pour le switch------
+configure terminal
+interface vlan 1
+ip address 172.17.28.254 255.255.255.0
+no shutdown
+exit
+ip default-gateway 172.17.28.5
+end
+
+-------Mise à Jour de l'horloge-----------
+clock set 15:00:00 31 Jan 2035
+show clock
+
+-------Activation du protocole SSH----------
+
+configure terminal
+ip domain name batman.com
+ip ssh version 2
+crypto key generate rsa general-keys modulus 1024
+username Cheikh secret hulk
+line vty 0 4
+login local
+transport input ssh
+exit
+
+------Enregistrement des modifications dans un fichier---------
+
+copy running-config startup-config (config.txt)
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
