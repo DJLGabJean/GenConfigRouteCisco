@@ -1,0 +1,12 @@
+configure terminal
+no ip domain-lookup
+end
+configure terminal
+clock set timezone UTC 0
+end
+configure terminal
+hostname SW_UL_1
+end
+configure terminal
+banner motd #bonjour#
+end
