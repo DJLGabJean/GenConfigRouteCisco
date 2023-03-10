@@ -216,6 +216,7 @@ dateConfig
 hostnameConfig
 bannerConfig
 mdpsConfig
+echo "Ce n'est pas encore pas fini, payer pour avoir la suite en extension eheh"
 
 
 
