@@ -225,3 +225,25 @@ echo "Ce n'est pas encore pas fini, payer pour avoir la suite en extension eheh"
 #     while $etp1
 #         while $etp2
 #             while $etp3
+
+fin=0
+
+# while [ $fin != 1 ]
+# do
+#     etp1=0
+
+#     while [ $etp1 != 1 ]
+#     do
+#         etp2=0
+
+#         while [ $etp2 != 1 ]
+#         do
+#             etp3=0
+
+#             while [ $etp3 != 1 ]
+#             do
+#                 # Instructions
+#             done
+#         done
+#     done
+# done
