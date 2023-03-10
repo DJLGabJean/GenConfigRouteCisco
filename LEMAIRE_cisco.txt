@@ -5,8 +5,8 @@ configure terminal
 clock set timezone UTC 0
 end
 configure terminal
-hostname SW_UL_1
+hostname SW-UL-85
 end
 configure terminal
-banner motd #bonjour#
+banner motd #michel#
 end
