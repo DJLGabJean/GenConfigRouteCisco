@@ -5,18 +5,18 @@ configure terminal
 clock set timezone UTC 0 
 end
 configure terminal
-hostname SDF
+hostname sw
 end
 configure terminal
 line console 0
-password couille
+password coucou
 login
 end
 configure terminal
-enable secret zbeub
+enable secret salut
 exit
 configure terminal
-line vty 15
-password lol
+line vty 5
+password yeah
 login
 end

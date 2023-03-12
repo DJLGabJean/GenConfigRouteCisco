@@ -7,6 +7,7 @@ function checkFile {
         echo ""
         rm -f LEMAIRE_cisco.txt
         return 1
+
     else
         echo "Le fichier LEMAIRE_cisco.txt n'existe pas!"
         echo ""
@@ -34,7 +35,7 @@ end" >> LEMAIRE_cisco.txt
 ip domain-lookup 
 end" >> LEMAIRE_cisco.txt
             echo ""
-        return 0
+            return 0
 
         else
             echo "Veuillez répondre par (O)ui ou par (N)on!"
@@ -128,28 +129,24 @@ end" >> LEMAIRE_cisco.txt
     else
         echo "Votre mot de passe est vide!"
     fi
-    read -p "Entrez un mot de passe pour le mode privilégié: " mdpPrive
 
+    read -p "Entrez un mot de passe pour le mode privilégié: " mdpPrive
     if [ -n "$mdpPrive" ]; then
         echo "configure terminal
 enable secret $mdpPrive
 exit" >> LEMAIRE_cisco.txt
         echo "Votre mot de passe pour le mode privilégié: $mdpPrive"
         echo ""
-
     else
         echo "Votre mot de passe pour le mode privilégié est vide!"
     fi
 
     while true; do
         read -p "Donner une ligne pour le port console virtuel entre 0 et 15: " portVty
-
         if [[ ! "$portVty" =~ ^[0-15]{1,2}$ ]]; then
             echo "Votre port console virtuel doit être comprise entre 0 et 15!"
-
         else
             read -p "Entrez un mot de passe pour le mode vty: " mdpVty
-
             if [ -n "$mdpVty" ]; then
                 echo "configure terminal
 line vty $portVty
@@ -160,14 +157,59 @@ end" >> LEMAIRE_cisco.txt
                 echo "Votre mot de passe pour le mode vty: $mdpVty"
                 echo ""
                 return 1
-
             else
                 echo "Votre mot de passe pour le mode vty est vide!"
             fi
         fi
     done
+    return 0
 }
 
+function encryptMdps {
+    encrypt=""
+    while [[ $encrypt != "o" && $encrypt != "O" && $encrypt != "n" && $encrypt != "N" ]]; do
+        echo "Voulez-vous chiffrer les mots de passe (o/n): " encrypt
+
+        if [[ $encrypt == "o" || $encrypt == "O" ]]; then
+            echo "Activation du chiffrement des mots de passe"
+            echo "configure terminal
+service password-encryption
+end" >> LEMAIRE_cisco.txt
+            echo ""
+            return 1
+
+        elif [[ $encrypt == "n" || $encrypt == "N" ]]; then
+            echo "Chiffrement des mots de passe non activé"
+            echo ""
+            return 0
+
+        else
+            echo "Veuillez répondre par (O)ui ou par (N)on!"
+        fi
+    done
+}
+
+function vlanConfig {
+    ip=""
+    while [[ ! $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$  ]]; do
+        read -p "Entrez une adresse IP: " ip
+
+        if [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+            echo "configure terminal
+interface vlan 1
+ip address $ip
+no shutdown
+end" >> LEMAIRE_cisco.txt
+            echo "Votre adresse IP: $ip"
+            echo ""
+            return 1
+
+        else
+            echo "Votre adresse IP est incorrecte!"
+        fi
+    done
+    return 0
+}
 
 
 checkFile
@@ -176,4 +218,6 @@ dateConfig
 hostnameConfig
 bannerConfig
 mdpsConfig
+encryptMdps
+vlanConfig
 echo "Ce n'est pas encore pas fini, payer pour avoir la suite en extension eheh"
