@@ -1,25 +1,22 @@
 configure terminal
 no ip domain-lookup
 end
-configure terminal
-clock set timezone UTC 0
+configure terminal 
+clock set timezone UTC 0 
 end
 configure terminal
 hostname SDF
 end
 configure terminal
-banner motd #message#
-end
-configure terminal
 line console 0
-password dqzdqz
+password couille
 login
 end
 configure terminal
-              enable secret dqzdzq
-              exit
+enable secret zbeub
+exit
 configure terminal
-line vty 8
-password michek
+line vty 15
+password lol
 login
 end
