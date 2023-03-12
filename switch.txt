@@ -9,15 +9,15 @@ hostname SW
 end
 configure terminal
 line console 0
-password coucou
+password michel
 login
 end
 configure terminal
-enable secret salut
+enable secret dzqdzq
 exit
 configure terminal
-line vty 5
-password salut
+line vty 15
+password dqzdqz
 login
 end
 configure terminal
@@ -25,13 +25,13 @@ service password-encryption
 end
 configure terminal
 interface vlan 1
-ip address 150.58.6.8
+ip address 150.6.8.9
 no shutdown
 end
 configure terminal
 ip domain-name coucou.com
 crypto key generate rsa modulus 1024
-username michel privilege 15 secret gérard
+username yeah privilege 15 secret yomec
 line vty 0 4
 transport input ssh
 login local
