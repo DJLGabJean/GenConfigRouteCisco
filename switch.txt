@@ -1,0 +1,39 @@
+configure terminal
+no ip domain-lookup
+end
+configure terminal 
+clock set timezone UTC 0 
+end
+configure terminal
+hostname SW
+end
+configure terminal
+line console 0
+password coucou
+login
+end
+configure terminal
+enable secret salut
+exit
+configure terminal
+line vty 5
+password salut
+login
+end
+configure terminal
+service password-encryption
+end
+configure terminal
+interface vlan 1
+ip address 150.58.6.8
+no shutdown
+end
+configure terminal
+ip domain-name coucou.com
+crypto key generate rsa modulus 1024
+username michel privilege 15 secret gérard
+line vty 0 4
+transport input ssh
+login local
+exit
+end
