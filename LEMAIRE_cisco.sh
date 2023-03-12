@@ -21,11 +21,10 @@ function domainLookup {
         read -p "Voulez-vous activer le no ip domain-lookup (o/n): " rep
 
         if [[ $rep == "o" || $rep == "O" ]]; then
-            echo "Activation de no ip domain-lookup"
-            echo "configure terminal" >> LEMAIRE_cisco.txt
-            echo "no ip domain-lookup" >> LEMAIRE_cisco.txt
-            echo "end" >> LEMAIRE_cisco.txt
-            echo ""
+            echo "Activation de no ip domain-lookup
+configure terminal
+no ip domain-lookup
+end" >> LEMAIRE_cisco.txt
 
             configure terminal >> /dev/null 2>&1
             no ip domain-lookup >> /dev/null 2>&1
@@ -82,10 +81,10 @@ function dateConfig {
 
 function hostnameConfig {
     hostname=""
-    while [[ ! $hostname =~ ^SW-UL-([0-9]{1,2})+$  ]]; do
+    while [[ ! $hostname =~ ^[a-zA-Z][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]$ ]]; do
         read -p "Entrez le nom d'hôte: " hostname
 
-        if [[ $hostname =~ ^SW-UL-([0-9]{1,2})+$ ]]; then
+        if [[ $hostname =~ ^[a-zA-Z][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]$ ]]; then
             echo "configure terminal" >> LEMAIRE_cisco.txt
             echo "hostname $hostname" >> LEMAIRE_cisco.txt
             echo "end" >> LEMAIRE_cisco.txt
@@ -133,81 +132,68 @@ function bannerConfig {
 
 
 function mdpsConfig {
-    fin=0
     read -p "Entrez un mot de passe pour la console: " mdpCons
 
-    while [[ $fin != 1 ]]; do
+    if [ -n "$mdpCons" ]; then
+        echo "configure terminal
+line console 0
+password $mdpCons
+login
+end" >> LEMAIRE_cisco.txt
+        configure terminal >> /dev/null 2>&1
+        line console 0 >> /dev/null 2>&1
+        password $mdpCons >> /dev/null 2>&1
+        login >> /dev/null 2>&1
+        end >> /dev/null 2>&1
+        echo "Votre mot de passe: $mdpCons"
+        echo ""
+    else
+        echo "Votre mot de passe est vide!"
+    fi
 
-        if [ $mdpCons -gt 0 ]; then
-            echo "configure terminal" >> LEMAIRE_cisco.txt
-            echo "line console 0" >> LEMAIRE_cisco.txt
-            echo "password $mdpCons" >> LEMAIRE_cisco.txt
-            echo "login" >> LEMAIRE_cisco.txt
-            echo "end" >> LEMAIRE_cisco.txt
+    read -p "Entrez un mot de passe pour le mode privilégié: " mdpPrive
 
-            configure terminal >> /dev/null 2>&1
-            line console 0 >> /dev/null 2>&1
-            password $mdpCons >> /dev/null 2>&1
-            login >> /dev/null 2>&1
-            end >> /dev/null 2>&1
+    if [ -n "$mdpPrive" ]; then
+        echo "configure terminal
+enable secret $mdpPrive
+exit" >> LEMAIRE_cisco.txt
 
-            echo "Votre mot de passe: $mdpCons"
-            echo ""
+        echo "Votre mot de passe pour le mode privilégié: $mdpPrive"
+        echo ""
+    else
+        echo "Votre mot de passe pour le mode privilégié est vide!"
+    fi
+
+    while true; do
+        read -p "Donner une ligne pour le port console virtuel entre 0 et 15: " portVty
+
+        if [[ ! "$portVty" =~ ^[0-9]{1,2}$ ]]; then
+            echo "Votre port console virtuel doit être comprise entre 0 et 15!"
         else
-            echo "Votre mot de passe est vide!"
-        fi
-
-        read -p "Entrez un mot de passe pour le mode privilégié: " mdpPrive
-
-        if [ $mdpPrive -gt 0 ]; then
-            echo "configure terminal" >> LEMAIRE_cisco.txt
-            echo "enable secret $mdpPrive" >> LEMAIRE_cisco.txt
-            echo "exit" >> LEMAIRE_cisco.txt
-
-            configure terminal >> /dev/null 2>&1
-            enable secret $mdpPrive >> /dev/null 2>&1
-            exit >> /dev/null 2>&1
-
-            echo "Votre mot de passe pour le mode privilégié: $mdpCons"
-            echo ""
-        else
-            echo "Votre mot de passe pour le mode privilégié est vide!"
-        fi
-
-        portVty=""
-        mdpVty=""
-        while [[ ! $portVty =~ ^[0-15]$ ]]; do
-            read -p "Donner une ligne pour le port console virtuel entre 0 et 15: " portVty 
             read -p "Entrez un mot de passe pour le mode vty: " mdpVty
 
-            if [[ $portVty =~ ^[0-15]$ ]]; then
-                if [ $mdpVty -gt 0 ]; then
-                    echo "configure terminal" >> LEMAIRE_cisco.txt
-                    echo "line vty $portVty" >> LEMAIRE_cisco.txt
-                    echo "password $mdpVty" >> LEMAIRE_cisco.txt
-                    echo "login" >> LEMAIRE_cisco.txt
-                    echo "end" >> LEMAIRE_cisco.txt
-
-                    configure terminal >> /dev/null 2>&1
-                    line vty $portVty >> /dev/null 2>&1
-                    password $mdpVty >> /dev/null 2>&1
-                    login >> /dev/null 2>&1
-                    end >> /dev/null 2>&1
-            
-                    echo "Votre port console virtuel: $portVty"
-                    echo "Votre mot de passe pour le mode vty: $mdpVty"
-                    echo ""
-                    return 1
-                else
-                    echo "Votre mot de passe pour le mode vty est vide!"
-                fi
+            if [ -n "$mdpVty" ]; then
+                echo "configure terminal
+line vty $portVty
+password $mdpVty
+login
+end" >> LEMAIRE_cisco.txt
+                configure terminal >> /dev/null 2>&1
+                line vty $portVty >> /dev/null 2>&1
+                password $mdpVty >> /dev/null 2>&1
+                login >> /dev/null 2>&1
+                end >> /dev/null 2>&1
+                echo "Votre port console virtuel: $portVty"
+                echo "Votre mot de passe pour le mode vty: $mdpVty"
+                echo ""
+                return 1
             else
-                echo "Votre port console virtuel doit etre comprise entre 0 et 15!"
+                echo "Votre mot de passe pour le mode vty est vide!"
             fi
-        done
+        fi
     done
-    return $fin=1
 }
+
 
 
 checkFile

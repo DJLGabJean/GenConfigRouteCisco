@@ -5,8 +5,21 @@ configure terminal
 clock set timezone UTC 0
 end
 configure terminal
-hostname SW-UL-85
+hostname SDF
 end
 configure terminal
-banner motd #michel#
+banner motd #message#
+end
+configure terminal
+line console 0
+password dqzdqz
+login
+end
+configure terminal
+              enable secret dqzdzq
+              exit
+configure terminal
+line vty 8
+password michek
+login
 end
