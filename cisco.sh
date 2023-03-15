@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 function checkFile {
     if [ -f switch.txt ]; then
         echo "Le fichier switch.txt existe déjà!"
@@ -14,7 +13,6 @@ function checkFile {
         return 0
     fi
 }
-
 
 function domainLookup {
     rep=""
@@ -48,11 +46,11 @@ end" >> switch.txt
 function dateConfig {
     date=""
     while [[ $date != "o" && $date != "O" && $date != "n" && $date != "N" ]]; do
-        read -p "Voulez-vous activer la date et l'heure identique du système Linux et du routeur Cisco (o/n): " date
+        read -p "Voulez-vous activer la date et l'heure identique du système Linux au routeur Cisco (o/n): " date
 
         if [[ $date == "o" || $date == "O" ]]; then
             echo "Activation de la date et heure identique" 
-            echo "configure terminal 
+            echo "configure terminal
 clock set timezone UTC 0 
 end" >> switch.txt
             echo ""
@@ -131,7 +129,7 @@ end" >> switch.txt
         echo "Votre mot de passe est vide!"
     fi
 
-    read -s -p "Entrez un mot de passe pour le mode privilégié: " mdpPrive
+    read -p "Entrez un mot de passe pour le mode privilégié: " mdpPrive
     if [ -n $mdpPrive ]; then
         echo "configure terminal
 enable secret $mdpPrive
@@ -143,12 +141,12 @@ exit" >> switch.txt
         echo "Votre mot de passe pour le mode privilégié est vide!"
     fi
 
-    while true; do
+    while [[ $portVty < 0 || $portVty > 15 ]]; do
         read -p "Donner une ligne pour le port console virtuel entre 0 et 15: " portVty
-        if [[ ! $portVty =~ ^[0-15]{1,2}$ ]]; then
+        if [[ $portVty < 0 || $portVty > 15 ]]; then
             echo "Votre port console virtuel doit être comprise entre 0 et 15!"
         else
-            read -s -p "Entrez un mot de passe pour le mode vty: " mdpVty
+            read -p "Entrez un mot de passe pour le mode vty: " mdpVty
             if [ -n $mdpVty ]; then
                 echo "configure terminal
 line vty $portVty
@@ -221,9 +219,11 @@ function sshConfig {
 
         if [[ $activateSSH == "o" || $activateSSH == "O" ]]; then
             read -p "Entrez le nom de domaine: " domainName
-            read -p "Entrez le modulus (1024 ou 2048 bits): " modulus
+            while [[ $modulus != 1024 && $modulus != 2048 ]]; do
+                read -p "Entrez le modulus (1024 ou 2048 bits): " modulus
+            done
             read -p "Entrez le nom d'utilisateur pour la connexion SSH: " sshUsername
-            read -s -p "Entrez le mot de passe pour la connexion SSH: " sshPassword
+            read -p "Entrez le mot de passe pour la connexion SSH: " sshPassword
             echo ""
             echo "configure terminal
 ip domain-name $domainName
@@ -237,7 +237,7 @@ end" >> switch.txt
             # sshUsername=$(echo "$sshUsername" | tr -c -d '*')
             # sshPassword=$(echo "$sshPassword" | tr -c -d '*')
             echo "Activation de la connexion SSH"
-            echo "Les paramètres du SSH sont les suivants:"
+            # echo "Les paramètres du SSH sont les suivants:"
             echo "Nom de domaine: $domainName"
             echo "Modulus: $modulus bits"
             # echo "Nom d'utilisateur pour la connexion SSH: $sshUsername"
@@ -256,6 +256,11 @@ end" >> switch.txt
     return 0
 }
 
+function interfaceIP {
+    echo "show ip interface brief" >> switch.txt
+    return 1
+}
+
 
 checkFile
 domainLookup
@@ -266,21 +271,5 @@ mdpsConfig
 encryptMdps
 vlanConfig
 sshConfig
+interfaceIP
 
-
-# A voir plus tard
-
-# # Demande le nom d'hôte du switch
-# read -p "Entrez le nom d'hôte du switch : " hostname
-
-# # Demande les informations de connexion
-# read -p "Entrez le nom d'utilisateur : " username
-# read -s -p "Entrez le mot de passe : " password
-# echo ""
-
-# # Connecte au switch et récupère les adresses IP des interfaces
-# interfaces=$(sshpass -p "$password" ssh -o StrictHostKeyChecking=no "$username"@"$hostname" "show ip interface brief | grep -v unassigned | awk '{print \$1,\$2,\$3}'")
-
-# # Affiche les adresses IP des interfaces
-# echo "Adresses IP des interfaces du switch $hostname :"
-# echo "$interfaces"
