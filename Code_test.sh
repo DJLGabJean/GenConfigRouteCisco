@@ -39,3 +39,23 @@
 #         fi
 #     done
 # }
+
+
+
+# ask_yes_or_no_question() {
+#     local question=$1
+#     local response
+#     while true; do
+#         read -p "$question (oui/non) " response
+#         case $response in
+#             [oO][uU][iI]|[yY][eE][sS]) return 0 ;;
+#             [nN][oO]|[nN]) return 1 ;;
+#             *) echo "Veuillez répondre par oui ou non." ;;
+#         esac
+#     done
+# }
+
+
+## Example for encrypt a password with asterisks:
+
+# msg2=$(echo "$msg" | tr -c -d '*')

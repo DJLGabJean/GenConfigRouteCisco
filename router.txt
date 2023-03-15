@@ -1,0 +1,25 @@
+configure terminal 
+ip domain-lookup 
+end
+configure terminal
+hostname SW-UL-Lemaire
+end
+configure terminal
+line console 0
+password popopo
+login
+end
+configure terminal
+enable secret loulou
+exit
+configure terminal
+line vty 1
+password teletubbies
+login
+end
+configure terminal
+interface vlan 1
+ip address 174.200.5.8
+no shutdown
+end
+show ip interface brief
