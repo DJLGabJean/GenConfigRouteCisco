@@ -6,9 +6,20 @@ hostname SW-UL-LEMAIRE
 end
 configure terminal
 line console 0
-password cool
+password spiderman
 login
 end
 configure terminal
-enable secret rayman
+enable secret wolverine
 exit
+configure terminal
+line vty 1
+password thanos
+login
+end
+configure terminal
+interface vlan 1
+ip address 192.128.50.5 000000000000000000000001
+no shutdown
+end
+show ip interface brief

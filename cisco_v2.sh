@@ -63,6 +63,7 @@ function questionOuiNon() {
 # Configuration du routeur ou du switch
 
 function domainLookup {
+        echo "";
         questionOuiNon "Voulez-vous activer le no ip domain-lookup (o/n): " rep
 
         if [[ $rep == "o" || $rep == "O" ]]; then
@@ -87,7 +88,7 @@ end" >> $fileName
 function dateConfig {
         questionOuiNon "Voulez-vous activer la date et l'heure identique du système Linux au routeur Cisco (o/n): " date
 
-        if [[ $date == "o" || $date == "O" ]]; then
+        if [[ $date =~ ^[Oo]$ ]]; then
             echo "Activation de la date et heure identique" 
             echo "configure terminal
 clock set timezone UTC 0 
@@ -126,7 +127,7 @@ end" >> $fileName
 
 function bannerConfig {
     banniere=""
-    while [[ ! $banniere =~ ^\#.{0,20}\#$ ]]; do
+    while [[ ! $banniere =~ ^\#.{0,30}\#$ ]]; do
         read -p "Entrez une bannière pour votre routeur: " banniere
 
         if [[ $banniere =~ ^\#.{0,20}\#$ ]]; then
@@ -134,7 +135,6 @@ function bannerConfig {
 banner motd $banniere
 end" >> $fileName
             echo "Le format de la bannière est correct!"
-            echo "Votre bannière: $banniere"
             echo ""
             return 1
 
@@ -217,40 +217,37 @@ end" >> $fileName
 
 
 function vlanConfig {
-    ip=""
+    read -p "Entrez une adresse IP: " ip
     while [[ ! $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; do
-        read -p "Entrez une adresse IP: " ip
+        read -p "Entrez une adresse IP valide: " ip
+    done
 
-        if [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-            echo "configure terminal
+    read -p "Entrez un masque de sous-réseau (longueur de préfixe, entre 8 et 32): " prefixLength
+    while (( prefixLength < 8 || prefixLength > 32 )); do
+        read -p "Entrez un masque de sous-réseau valide: " prefixLength
+    done
+
+    subnet_mask_binary=$(printf "%*s" "${prefixLength}" "1" | tr ' ' '0')
+    echo "configure terminal
 interface vlan 1
-ip address $ip
+ip address $ip $subnet_mask_binary
 no shutdown
 end" >> $fileName
-            echo "Votre adresse IP: $ip"
-            echo ""
-            return 1
-
-        else
-            echo "Votre adresse IP est incorrecte!"
-        fi
-    done
-    return 0
+    echo ""
 }
 
 function sshConfig {
-        questionOuiNon "Voulez-vous activer le SSH (o/n): " activateSSH
+    questionOuiNon "Voulez-vous activer le SSH (o/n): " activateSSH
+    if [[ $activateSSH =~ ^[Oo]$ ]]; then
+        read -p "Entrez le nom de domaine: " domainName
+        while (( modulus != 1024 && modulus != 2048 )); do
+            read -p "Entrez le modulus (1024 ou 2048 bits): " modulus
+        done
+        read -p "Entrez le nom d'utilisateur pour la connexion SSH: " sshUsername
+        read -p "Entrez le mot de passe pour la connexion SSH: " sshPassword
 
-        if [[ $activateSSH == "o" || $activateSSH == "O" ]]; then
-            read -p "Entrez le nom de domaine: " domainName
-
-            while [[ $modulus != 1024 && $modulus != 2048 ]]; do
-                read -p "Entrez le modulus (1024 ou 2048 bits): " modulus
-            done
-            read -p "Entrez le nom d'utilisateur pour la connexion SSH: " sshUsername
-            read -p "Entrez le mot de passe pour la connexion SSH: " sshPassword
-            echo ""
-            echo "configure terminal
+        echo ""
+        echo "configure terminal
 ip domain-name $domainName
 crypto key generate rsa modulus $modulus
 username $sshUsername privilege 15 secret $sshPassword
@@ -260,19 +257,13 @@ login local
 exit
 end" >> $fileName
 
-            echo "Activation de la connexion SSH"
-            echo "Nom de domaine: $domainName"
-            echo "Modulus: $modulus bits"
-            echo "Nom d'utilisateur pour la connexion SSH: $sshUsername"
-            echo "Mot de passe pour la connexion SSH: $sshPassword"
-            return 1
-        
-        else
-            echo "Connexion SSH non activée"
-            echo ""
-            return 0
-        fi
-
+        echo "Activation de la connexion SSH"
+        return 1
+    else
+        echo "Connexion SSH non activée"
+        echo ""
+        return 0
+    fi
 }
 
 function interfaceIP {
