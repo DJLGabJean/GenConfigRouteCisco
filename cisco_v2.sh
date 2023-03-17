@@ -27,13 +27,14 @@ function createConfigFile {
                 o|O)
                     rm "$fileName"
                     touch "$fileName"
-                    return 1
+                    return 0
                     ;;
                 n|N)
                     return 0
                     ;;
                 *)
                     echo "Veuillez répondre par (O)ui ou par (N)on!"
+                    continue
                     ;;
             esac
 
@@ -51,9 +52,18 @@ function questionOuiNon() {
     while true; do
         read -p "$question " response
         case $response in
-            [oO]) return 0 ;;
-            [nN]) return 1 ;;
-            *) echo "Veuillez répondre par [o]ui ou [n]on!" ;;
+            o|O)
+                rep="o"
+                break
+                ;;
+            n|N)
+                rep="n"
+                break
+                ;;
+            *) 
+                echo "Veuillez répondre par [o]ui ou [n]on!" 
+                continue
+                ;;
         esac
     done
 }
@@ -72,7 +82,7 @@ function domainLookup {
 no ip domain-lookup
 end" >> $fileName
             echo ""
-            return 1
+            return 0
 
         else
             echo "Activation de ip domain-lookup"
@@ -86,15 +96,15 @@ end" >> $fileName
 
 
 function dateConfig {
-        questionOuiNon "Voulez-vous activer la date et l'heure identique du système Linux au routeur Cisco (o/n): " date
+        questionOuiNon "Voulez-vous activer la date et l'heure identique du système Linux au routeur Cisco (o/n): " rep
 
-        if [[ $date =~ ^[Oo]$ ]]; then
+        if [[ $rep == "o" || $rep == "O" ]]; then
             echo "Activation de la date et heure identique" 
             echo "configure terminal
 clock set timezone UTC 0 
 end" >> $fileName
             echo ""
-            return 1
+            return 0
 
         else
             echo "Désactivation de la date et heure identique"
@@ -115,13 +125,12 @@ hostname $hostname
 end" >> $fileName
             echo "Le format du nom d'hôte est correct!"
             echo ""
-            return 1
+            return 0
 
         else
             echo "Le format du nom d'hôte est incorrect!"
         fi
     done
-    return 0
 }
 
 
@@ -131,12 +140,12 @@ function bannerConfig {
         read -p "Entrez une bannière pour votre routeur: " banniere
 
         if [[ $banniere =~ ^\#.{0,20}\#$ ]]; then
-"configure terminal
+        echo "configure terminal
 banner motd $banniere
 end" >> $fileName
             echo "Le format de la bannière est correct!"
             echo ""
-            return 1
+            return 0
 
         else
             echo "Le format de la bannière est incorrect!"
@@ -156,8 +165,6 @@ line console 0
 password $mdpCons
 login
 end" >> $fileName
-        echo "Votre mot de passe: $mdpCons"
-        echo ""
     else
         echo "Votre mot de passe est vide!"
     fi
@@ -167,8 +174,6 @@ end" >> $fileName
         echo "configure terminal
 enable secret $mdpPrive
 exit" >> $fileName
-        echo "Votre mot de passe pour le mode privilégié: $mdpPrive"
-        echo ""
     else
         echo "Votre mot de passe pour le mode privilégié est vide!"
     fi
@@ -185,8 +190,6 @@ line vty $portVty
 password $mdpVty
 login
 end" >> $fileName
-                echo "Votre port console virtuel: $portVty"
-                echo "Votre mot de passe pour le mode vty: $mdpVty"
                 echo ""
                 return 1
             else
@@ -198,21 +201,22 @@ end" >> $fileName
 }
 
 function encryptMdps {
-        questionOuiNon "Voulez-vous chiffrer les mots de passe (o/n): " encrypt
+        questionOuiNon "Voulez-vous chiffrer les mots de passe (o/n): " rep
 
-        if [[ $encrypt == "o" || $encrypt == "O" ]]; then
+        if [[ $rep == "o" || $rep == "O" ]]; then
             echo "Activation du chiffrement des mots de passe"
             echo "configure terminal
 service password-encryption
 end" >> $fileName
             echo ""
-            return 1
+            return 0
 
         else
             echo "Chiffrement des mots de passe non activé"
             echo ""
             return 0
         fi
+        return 1
 }
 
 
@@ -234,11 +238,13 @@ ip address $ip $subnet_mask_binary
 no shutdown
 end" >> $fileName
     echo ""
+    return 0
 }
 
 function sshConfig {
-    questionOuiNon "Voulez-vous activer le SSH (o/n): " activateSSH
-    if [[ $activateSSH =~ ^[Oo]$ ]]; then
+    questionOuiNon "Voulez-vous activer le SSH (o/n): " rep
+
+    if [[ $rep == "o" || $rep == "O" ]]; then
         read -p "Entrez le nom de domaine: " domainName
         while (( modulus != 1024 && modulus != 2048 )); do
             read -p "Entrez le modulus (1024 ou 2048 bits): " modulus
@@ -258,7 +264,7 @@ exit
 end" >> $fileName
 
         echo "Activation de la connexion SSH"
-        return 1
+        return 0
     else
         echo "Connexion SSH non activée"
         echo ""
@@ -268,7 +274,7 @@ end" >> $fileName
 
 function interfaceIP {
     echo "show ip interface brief" >> $fileName
-    return 1
+    return 0
 }
 
 ############################################################################################################

@@ -2,7 +2,13 @@ configure terminal
 no ip domain-lookup
 end
 configure terminal
+clock set timezone UTC 0 
+end
+configure terminal
 hostname SW-UL-LEMAIRE
+end
+configure terminal
+banner motd #Bonjour#
 end
 configure terminal
 line console 0
@@ -18,8 +24,20 @@ password thanos
 login
 end
 configure terminal
+service password-encryption
+end
+configure terminal
 interface vlan 1
 ip address 192.128.50.5 000000000000000000000001
 no shutdown
+end
+configure terminal
+ip domain-name jeangab.com
+crypto key generate rsa modulus 1024
+username ultron privilege 15 secret blackpanther
+line vty 0 4
+transport input ssh
+login local
+exit
 end
 show ip interface brief
